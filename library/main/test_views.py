@@ -35,7 +35,6 @@ def create_books(db):
 
     yield books
 
-# Тестирование получения статистики авторов
 @pytest.mark.django_db
 def test_get_author_stat(apiclient, create_authors):
     response = apiclient.get("/api/authors/stat/")
@@ -44,7 +43,6 @@ def test_get_author_stat(apiclient, create_authors):
     for item in response.data['results']:
         assert "books_count" in item
 
-# Тестирование получения статистики автора по ID
 @pytest.mark.django_db
 def test_get_author_stat_id(apiclient, create_authors):
     author = Author.objects.first()
@@ -54,7 +52,6 @@ def test_get_author_stat_id(apiclient, create_authors):
     assert "books_count" in response.data
 
 
-# Тестирование получения топа книг по количеству копий
 @pytest.mark.django_db
 def test_get_top_copies(apiclient, create_books):
     response = apiclient.get("/api/books/copies/?top=2")
@@ -63,7 +60,6 @@ def test_get_top_copies(apiclient, create_books):
     for book in response.data['results']:
         assert "count" in book
 
-# Тестирование создания новых книг
 @pytest.mark.django_db
 def test_delivery_books(apiclient):
     new_book_data = {
@@ -75,7 +71,6 @@ def test_delivery_books(apiclient):
     assert response.status_code == status.HTTP_201_CREATED
     assert Book.objects.filter(title=new_book_data["title"]).exists()
 
-# Тестирование поиска книг по названию
 @pytest.mark.django_db
 def test_search_books_by_title(apiclient, create_books):
     response = apiclient.get("/api/books/?title=Книга 1")
@@ -83,7 +78,6 @@ def test_search_books_by_title(apiclient, create_books):
     assert any(book["title"].startswith("Книга 1") for book in response.data['results'])
 
 
-# Тестирование обновления книги по ID
 @pytest.mark.django_db
 def test_update_book_by_id(apiclient, create_books):
     book = Book.objects.first()
@@ -94,7 +88,6 @@ def test_update_book_by_id(apiclient, create_books):
     assert book.title == updated_data["title"]
 
 
-# Тестирование удаления книги по ID
 @pytest.mark.django_db
 def test_delete_book_by_id(apiclient, create_books):
     book = Book.objects.first()
@@ -103,7 +96,6 @@ def test_delete_book_by_id(apiclient, create_books):
     assert not Book.objects.filter(id=book.id).exists()
 
 
-# Тестирование создания нового автора
 @pytest.mark.django_db
 def test_create_author(apiclient):
     new_author_data = {
@@ -113,9 +105,8 @@ def test_create_author(apiclient):
     assert response.status_code == status.HTTP_201_CREATED
     assert Author.objects.filter(name=new_author_data["name"]).exists()
 
-# Тестирование обновления автора по ID
 @pytest.mark.django_db
-def test_update_book_by_id(apiclient, create_authors):
+def test_update_author_by_id(apiclient, create_authors):
     author = Author.objects.first()
     updated_data = {"name": "Обновленное имя"}
     response = apiclient.patch(f"/api/authors/{author.id}/", updated_data, format="json")
@@ -124,9 +115,8 @@ def test_update_book_by_id(apiclient, create_authors):
     assert author.name == updated_data["name"]
 
 
-# Тестирование удаления автора по ID
 @pytest.mark.django_db
-def test_delete_book_by_id(apiclient, create_authors):
+def test_delete_author_by_id(apiclient, create_authors):
     author = Author.objects.first()
     response = apiclient.delete(f"/api/authors/{author.id}/")
     assert response.status_code == status.HTTP_204_NO_CONTENT
